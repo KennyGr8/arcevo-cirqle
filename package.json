@@ -1,26 +1,23 @@
 {
   "name": "arcevo-cirqle",
-  "version": "0.1.0",
   "private": true,
+  "version": "1.0.0",
+  "packageManager": "pnpm@10.20.0",
+  "workspaces": [
+    "apps/*"
+  ],
   "scripts": {
-    "dev": "next dev --turbopack",
-    "build": "next build --turbopack",
-    "start": "next start",
-    "lint": "biome check",
-    "format": "biome format --write"
-  },
-  "dependencies": {
-    "react": "19.1.0",
-    "react-dom": "19.1.0",
-    "next": "15.5.4"
+    "dev": "turbo run dev --parallel",
+    "build": "turbo run build",
+    "lint": "turbo run lint",
+    "test": "turbo run test",
+    "clean": "pnpm -r run clean",
+    "typecheck": "tsc -b --noEmit"
   },
   "devDependencies": {
-    "typescript": "^5",
-    "@types/node": "^20",
-    "@types/react": "^19",
-    "@types/react-dom": "^19",
-    "@tailwindcss/postcss": "^4",
-    "tailwindcss": "^4",
-    "@biomejs/biome": "2.2.0"
+    "@types/node": "^24.6.2",
+    "rimraf": "^6.0.1",
+    "turbo": "^2.0.0",
+    "typescript": "^5.3.3"
   }
 }

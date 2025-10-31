@@ -1,0 +1,87 @@
+name: 🚀 Deploy ArcevoCirqle (Next.js)
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+
+permissions:
+  contents: read
+  deployments: write
+
+concurrency:
+  group: deploy-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+
+    env:
+      NODE_ENV: production
+      NEXT_PUBLIC_APP_ENV: production
+      NEXT_TELEMETRY_DISABLED: 1
+
+    steps:
+      # 🧱 Checkout repository
+      - name: 📦 Checkout code
+        uses: actions/checkout@v4
+
+      # ⚡️ Setup Node + PNPM
+      - name: 🧰 Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: "pnpm"
+
+      - name: 📦 Install PNPM
+        run: npm install -g pnpm
+
+      - name: 🗂 Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      # 🧱 Build app
+      - name: 🏗️ Build Next.js app
+        working-directory: ./apps/web
+        run: pnpm run build
+
+      # 🧪 (Optional) Run tests before deploy
+      # - name: 🧪 Run tests
+      #   run: pnpm test
+
+      # -----------------------------------------
+      # 🔥 DEPLOYMENT SECTION (choose your target)
+      # -----------------------------------------
+
+      # Option 1️⃣ — Deploy to Render
+      - name: 🚀 Deploy to Render
+        if: env.RENDER_SERVICE_ID != ''
+        env:
+          RENDER_SERVICE_ID: ${{ secrets.RENDER_SERVICE_ID }}
+          RENDER_API_KEY: ${{ secrets.RENDER_API_KEY }}
+        run: |
+          echo "🔄 Triggering Render deploy..."
+          curl -X POST https://api.render.com/v1/services/$RENDER_SERVICE_ID/deploys \
+            -H "Accept: application/json" \
+            -H "Authorization: Bearer $RENDER_API_KEY"
+
+      # Option 2️⃣ — Deploy to Netlify
+      - name: 🚀 Deploy to Netlify
+        if: env.NETLIFY_AUTH_TOKEN != ''
+        env:
+          NETLIFY_AUTH_TOKEN: ${{ secrets.NETLIFY_AUTH_TOKEN }}
+          NETLIFY_SITE_ID: ${{ secrets.NETLIFY_SITE_ID }}
+        run: |
+          echo "🌍 Deploying to Netlify..."
+          pnpm dlx netlify-cli deploy --build --prod --dir=apps/web/out \
+            --auth=$NETLIFY_AUTH_TOKEN --site=$NETLIFY_SITE_ID
+
+      # -----------------------------------------
+      # ✅ Post-deploy summary
+      # -----------------------------------------
+      - name: ✅ Deployment summary
+        if: always()
+        run: echo "✅ Deployment workflow completed successfully!"

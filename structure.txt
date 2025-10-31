@@ -1,0 +1,77 @@
+arcevo-cirqle/
+│
+├── .github/
+│   └── workflows/
+│       └── deploy.yml                     # CI/CD pipeline for Vercel + Firebase
+│
+├── apps/
+│   └── web/                               # Cirqle Frontend App (Next.js)
+│       ├── src/app/                           # App Router Entry
+│       │   ├── (public)/                  # Public routes (Landing, About)
+│       │   │   ├── page.tsx
+│       │   │   └── about/
+│       │   ├── (auth)/                    # Auth routes (Firebase now, ArcID later)
+│       │   │   ├── login/
+│       │   │   ├── register/
+│       │   │   ├── reset/
+│       │   │   └── layout.tsx
+│       │   ├── (dashboard)/               # Authenticated area
+│       │   │   ├── page.tsx
+│       │   │   ├── cirqles/
+│       │   │   ├── projects/
+│       │   │   ├── messages/
+│       │   │   └── profile/
+│       │   ├── layout.tsx
+│       │   └── page.tsx
+│       │
+│       ├── src/components/                    # Shared React Components
+│       │   ├── ui/                        # Base UI elements (shadcn/ui style)
+│       │   ├── layout/                    # Navbars, sidebars, footers
+│       │   ├── cirqle/                    # Cirqle-specific UIs (cards, feeds)
+│       │   └── shared/                    # Reusable elements across features
+│       │
+│       ├── animations/                         # (lotties, gsap, framer)
+│       ├── hooks/                         # Reusable React hooks (useAuth, useCirqle)
+│       ├── lib/                           # Frontend logic (api.ts, auth adapters, formatters)
+│       │   ├── firebase/                  # Firebase config + adapters (v1)
+│       │   ├── arcid/                     # ArcID adapter (v2 placeholder)
+│       │   ├── api/                       # Fetchers or axios instances
+│       │   └── utils.ts
+│       │
+│       ├── src/styles/                        # Tailwind + global CSS
+│       ├── src/assets/                        # Static assets (lotties, images, icons, gradients)
+│       ├── env.d.ts                       # Typed environment variables
+│       ├── next.config.mjs
+│       ├── tailwind.config.ts
+│       ├── package.json
+│       └── tsconfig.json
+│
+├── packages/                              # Shared modules across ArcX ecosystem
+│   ├── ui/                                # Arcevo UI Kit (buttons, modals, etc.)
+│   ├── theme/                             # Design tokens (colors, typography, motion)
+│   ├── utils/                             # Shared utils (logger, date, format)
+│   ├── config/                            # Environment + constants
+│   └── types/                             # Global TypeScript types/interfaces
+│
+├── services/                              # Future backend services (API + Workers)
+│   ├── cirqle-api/
+│   │   ├── src/
+│   │   │   ├── routes/
+│   │   │   ├── controllers/
+│   │   │   ├── services/
+│   │   │   └── index.ts
+│   │   ├── prisma/                        # Database layer (for v2 ArcID + Cirqle)
+│   │   ├── Dockerfile
+│   │   └── package.json
+│   └── worker/                            # Background jobs / event processors
+│
+├── docs/                                  # Documentation & roadmap
+│   ├── architecture.md
+│   ├── ecosystem-map.md
+│   ├── roadmap.md
+│   └── design-system.md
+│
+├── turbo.json                             # Turborepo pipeline config
+├── tsconfig.base.json                     # Shared TS config
+├── package.json                           # Root package (workspaces)
+└── README.md

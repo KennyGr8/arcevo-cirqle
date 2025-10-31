@@ -1,0 +1,13 @@
+packages:
+  - apps/*
+
+onlyBuiltDependencies:
+  - '@firebase/util'
+  - '@tsparticles/engine'
+  - core-js
+  - msw
+  - protobufjs
+  - react-particles
+  - sharp
+  - tsparticles-engine
+  - unrs-resolver

@@ -10,9 +10,6 @@
 !.yarn/releases
 !.yarn/versions
 
-pnpm-lock.yaml
-/.turbo/
-
 # testing
 /coverage
 

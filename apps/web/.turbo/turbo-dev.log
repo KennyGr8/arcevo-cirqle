@@ -1,0 +1,16 @@
+
+> arcevo-cirqle@0.1.0 dev C:\Users\USER\Desktop\Projects\ArcevoStack\arcevo-cirqle\apps\web
+> next dev
+
+   ▲ Next.js 16.0.1 (Turbopack)
+   - Local:        http://localhost:3000
+   - Network:      http://172.17.240.1:3000
+
+ ✓ Starting...
+ ✓ Ready in 6s
+ ○ Compiling / ...
+ GET / 200 in 17.2s (compile: 15.2s, render: 2.0s)
+ ✓ Compiled in 294ms
+ GET / 200 in 882ms (compile: 320ms, render: 562ms)
+ GET / 200 in 1448ms (compile: 813ms, render: 635ms)
+ ✓ Compiled in 331ms
