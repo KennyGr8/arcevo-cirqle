@@ -46,7 +46,7 @@ jobs:
       # 🧱 Build app
       - name: 🏗️ Build Next.js app
         working-directory: ./apps/web
-        run: pnpm run build
+        run: pnpm build
 
       # 🧪 (Optional) Run tests before deploy
       # - name: 🧪 Run tests
