@@ -23,6 +23,8 @@ jobs:
     env:
       NODE_ENV: production
       NEXT_PUBLIC_APP_ENV: production
+      NEXT_PUBLIC_API_URL: https://placeholder.local/api
+      NEXT_PUBLIC_SITE_URL: https://placeholder.local
       NEXT_TELEMETRY_DISABLED: 1
 
     steps:
@@ -30,7 +32,7 @@ jobs:
       - name: 📦 Checkout code
         uses: actions/checkout@v4
 
-      # ⚡️ Setup Node + PNPM
+      # ⚙️ Setup Node.js and PNPM
       - name: 🧰 Setup Node.js
         uses: actions/setup-node@v4
         with:
@@ -43,22 +45,16 @@ jobs:
       - name: 🗂 Install dependencies
         run: pnpm install --frozen-lockfile
 
-      # 🧱 Build app
+      # 🧱 Build Next.js app (adjust working dir as needed)
       - name: 🏗️ Build Next.js app
         working-directory: ./apps/web
         run: pnpm build
 
-      # 🧪 (Optional) Run tests before deploy
-      # - name: 🧪 Run tests
-      #   run: pnpm test
-
-      # -----------------------------------------
-      # 🔥 DEPLOYMENT SECTION (choose your target)
-      # -----------------------------------------
+      # 🔥 DEPLOYMENT SECTION
 
       # Option 1️⃣ — Deploy to Render
       - name: 🚀 Deploy to Render
-        if: env.RENDER_SERVICE_ID != ''
+        if: ${{ secrets.RENDER_SERVICE_ID != '' && secrets.RENDER_API_KEY != '' }}
         env:
           RENDER_SERVICE_ID: ${{ secrets.RENDER_SERVICE_ID }}
           RENDER_API_KEY: ${{ secrets.RENDER_API_KEY }}
@@ -68,20 +64,19 @@ jobs:
             -H "Accept: application/json" \
             -H "Authorization: Bearer $RENDER_API_KEY"
 
-      # Option 2️⃣ — Deploy to Netlify
+      # Option 2️⃣ — Deploy to Netlify (Static Export)
       - name: 🚀 Deploy to Netlify
-        if: env.NETLIFY_AUTH_TOKEN != ''
+        if: ${{ secrets.NETLIFY_AUTH_TOKEN != '' && secrets.NETLIFY_SITE_ID != '' }}
         env:
           NETLIFY_AUTH_TOKEN: ${{ secrets.NETLIFY_AUTH_TOKEN }}
           NETLIFY_SITE_ID: ${{ secrets.NETLIFY_SITE_ID }}
         run: |
           echo "🌍 Deploying to Netlify..."
-          pnpm dlx netlify-cli deploy --build --prod --dir=apps/web/out \
-            --auth=$NETLIFY_AUTH_TOKEN --site=$NETLIFY_SITE_ID
+          pnpm dlx netlify-cli deploy --prod \
+            --dir=apps/web/out \
+            --auth="$NETLIFY_AUTH_TOKEN" \
+            --site="$NETLIFY_SITE_ID"
 
-      # -----------------------------------------
-      # ✅ Post-deploy summary
-      # -----------------------------------------
       - name: ✅ Deployment summary
         if: always()
         run: echo "✅ Deployment workflow completed successfully!"

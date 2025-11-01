@@ -75,3 +75,13 @@ arcevo-cirqle/
 ├── tsconfig.base.json                     # Shared TS config
 ├── package.json                           # Root package (workspaces)
 └── README.md
+
+
+................
+
+env:
+  NODE_ENV: production
+  NEXT_PUBLIC_APP_ENV: production
+  NEXT_PUBLIC_API_URL: ${{ secrets.NEXT_PUBLIC_API_URL }}
+  NEXT_PUBLIC_SITE_URL: https://arcevo-cirqle.netlify.app
+  NEXT_TELEMETRY_DISABLED: 1
