@@ -2,11 +2,9 @@ name: 🚀 Deploy ArcevoCirqle (Next.js)
 
 on:
   push:
-    branches:
-      - main
+    branches: [main]
   pull_request:
-    branches:
-      - main
+    branches: [main]
 
 permissions:
   contents: read
@@ -19,7 +17,6 @@ concurrency:
 jobs:
   build-and-deploy:
     runs-on: ubuntu-latest
-
     env:
       NODE_ENV: production
       NEXT_PUBLIC_APP_ENV: production
@@ -29,54 +26,82 @@ jobs:
 
     steps:
       # 🧱 Checkout repository
-      - name: 📦 Checkout code
+      - name: 📦 Checkout repository
         uses: actions/checkout@v4
 
-      # ⚙️ Setup Node.js and PNPM
+      # ⚙️ Setup Node.js with PNPM
       - name: 🧰 Setup Node.js
         uses: actions/setup-node@v4
         with:
           node-version: 20
-          cache: "pnpm"
+          cache: 'pnpm'
 
-      - name: 📦 Install PNPM
+      - name: 📦 Install PNPM globally
         run: npm install -g pnpm
 
+      # 🗂 Install dependencies
       - name: 🗂 Install dependencies
         run: pnpm install --frozen-lockfile
 
-      # 🧱 Build Next.js app (adjust working dir as needed)
-      - name: 🏗️ Build Next.js app
-        working-directory: ./apps/web
-        run: pnpm build
+      # 🌀 Restore Turborepo cache
+      - name: 🌀 Restore Turborepo cache
+        uses: actions/cache@v3
+        with:
+          path: |
+            .turbo
+            node_modules
+            apps/web/node_modules
+            packages/**/node_modules
+          key: turbo-${{ runner.os }}-${{ hashFiles('**/package-lock.json', '**/pnpm-lock.yaml') }}
 
-      # 🔥 DEPLOYMENT SECTION
+      # 🏗️ Build Only If Relevant Files Changed
+      - name: 🏗️ Build Cirqle Web App
+        working-directory: apps/web
+        if: ${{ github.event_name == 'push' || github.event_name == 'pull_request' }}
+        run: |
+          echo "💡 Checking if 'apps/web' changed..."
+          if git diff --name-only ${{ github.event.before }} ${{ github.sha }} | grep '^apps/web/' ; then
+            echo "🔨 Changes detected in web app. Running build..."
+            pnpm build
+          else
+            echo "⚡ No changes in web app. Skipping build."
+          fi
 
-      # Option 1️⃣ — Deploy to Render
+      # 🔥 Deploy to Render
       - name: 🚀 Deploy to Render
-        if: ${{ secrets.RENDER_SERVICE_ID != '' && secrets.RENDER_API_KEY != '' }}
         env:
           RENDER_SERVICE_ID: ${{ secrets.RENDER_SERVICE_ID }}
           RENDER_API_KEY: ${{ secrets.RENDER_API_KEY }}
         run: |
-          echo "🔄 Triggering Render deploy..."
-          curl -X POST https://api.render.com/v1/services/$RENDER_SERVICE_ID/deploys \
-            -H "Accept: application/json" \
-            -H "Authorization: Bearer $RENDER_API_KEY"
+          if [ -n "$RENDER_SERVICE_ID" ] && [ -n "$RENDER_API_KEY" ]; then
+            echo "🔄 Triggering Render deploy..."
+            curl -X POST https://api.render.com/v1/services/$RENDER_SERVICE_ID/deploys \
+              -H "Accept: application/json" \
+              -H "Authorization: Bearer $RENDER_API_KEY"
+          else
+            echo "⚠️ Render secrets not found. Skipping Render deploy."
+          fi
 
-      # Option 2️⃣ — Deploy to Netlify (Static Export)
-      - name: 🚀 Deploy to Netlify
-        if: ${{ secrets.NETLIFY_AUTH_TOKEN != '' && secrets.NETLIFY_SITE_ID != '' }}
+      # 🌍 Deploy to Netlify (only if build ran)
+      - name: 🌍 Deploy to Netlify
+        working-directory: apps/web
         env:
           NETLIFY_AUTH_TOKEN: ${{ secrets.NETLIFY_AUTH_TOKEN }}
           NETLIFY_SITE_ID: ${{ secrets.NETLIFY_SITE_ID }}
         run: |
-          echo "🌍 Deploying to Netlify..."
-          pnpm dlx netlify-cli deploy --prod \
-            --dir=apps/web/out \
-            --auth="$NETLIFY_AUTH_TOKEN" \
-            --site="$NETLIFY_SITE_ID"
+          if [ -n "$NETLIFY_AUTH_TOKEN" ] && [ -n "$NETLIFY_SITE_ID" ]; then
+            if [ -d ".next" ] || [ -d "out" ]; then
+              echo "🌍 Deploying to Netlify..."
+              pnpm dlx netlify-cli deploy --prod --dir=out \
+                --auth="$NETLIFY_AUTH_TOKEN" --site="$NETLIFY_SITE_ID"
+            else
+              echo "⚡ No build artifacts. Skipping Netlify deploy."
+            fi
+          else
+            echo "⚠️ Netlify secrets not found. Skipping Netlify deploy."
+          fi
 
+      # ✅ Summary
       - name: ✅ Deployment summary
         if: always()
         run: echo "✅ Deployment workflow completed successfully!"

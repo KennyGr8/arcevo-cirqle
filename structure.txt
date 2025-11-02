@@ -6,7 +6,7 @@ arcevo-cirqle/
 │
 ├── apps/
 │   └── web/                               # Cirqle Frontend App (Next.js)
-│       ├── src/app/                           # App Router Entry
+│       ├── app/                           # App Router Entry
 │       │   ├── (public)/                  # Public routes (Landing, About)
 │       │   │   ├── page.tsx
 │       │   │   └── about/
@@ -76,12 +76,4 @@ arcevo-cirqle/
 ├── package.json                           # Root package (workspaces)
 └── README.md
 
-
-................
-
-env:
-  NODE_ENV: production
-  NEXT_PUBLIC_APP_ENV: production
-  NEXT_PUBLIC_API_URL: ${{ secrets.NEXT_PUBLIC_API_URL }}
-  NEXT_PUBLIC_SITE_URL: https://arcevo-cirqle.netlify.app
-  NEXT_TELEMETRY_DISABLED: 1
+// 3HNT5C6N9AA9GGBRCKSDZMK8NPB756 - open-api recovery code...
