@@ -3,7 +3,7 @@
 
 import { ThemeProvider } from "next-themes";
 import { useState, useEffect } from "react";
-import Loader from "@/components/animations/Loader"; // ✅ restore this
+import Loader from "@/animations/Loader"; // ✅ restore this
 
 export default function ClientLayout({ children }: { children: React.ReactNode }) {
   const [loading, setLoading] = useState(true);
